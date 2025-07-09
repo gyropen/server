@@ -1,0 +1,28 @@
+from flask import Flask, request, jsonify
+from handwriting_recognizer import recognize_handwriting
+
+app = Flask(__name__)
+stroke_buffer = []
+
+@app.route('/send_stroke', methods=['POST'])
+def receive_stroke():
+    data = request.json
+    stroke_buffer.append(data)
+    return jsonify({"status": "stroke received"})
+
+@app.route('/recognize', methods=['POST'])
+def recognize():
+    global stroke_buffer
+    if not stroke_buffer:
+        return jsonify({"text": ""})
+    
+    text = recognize_handwriting(stroke_buffer)
+    stroke_buffer = []  # Clear after recognition
+    return jsonify({"text": text})
+
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "server up"})
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
