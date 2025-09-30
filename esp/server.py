@@ -1,11 +1,11 @@
+import time
 import network
 import urequests
-import time
 from machine import Pin, I2C
 
 # ====== WIFI CONFIG ======
-SSID = "arduino"
-PASSWORD = "test@1234"
+SSID = "Bushi Connection"
+PASSWORD = "25051971"
 
 print("Connecting to WiFi...")
 wlan = network.WLAN(network.STA_IF)
@@ -24,7 +24,7 @@ while not wlan.isconnected():
 print("Connected! IP:", wlan.ifconfig()[0])
 
 # ====== SERVER CONFIG ======
-SERVER_URL = "http://10.165.146.205:8000/imu-data/"
+SERVER_URL = "https://9e5de11b2bb6.ngrok-free.app/imu-data/"
 
 # ====== MPU CONFIG ======
 MPU_ADDR = 0x68
@@ -115,6 +115,7 @@ while True:
     data = read_imu()
     try:
         res = urequests.post(SERVER_URL, json=data)
+        print("Sent data:", data)
         res.close()
     except Exception as e:
         print("Error sending data:", e)

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>IMU Live Drawing</title>
+        <style>
+            body {
+                background: #111;
+                color: #fff;
+                text-align: center;
+            }
+            canvas {
+                border: 1px solid #fff;
+                background: #000;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>IMU Drawing Viewer</h2>
+        <canvas id="canvas" width="600" height="400"></canvas>
+
+        <script>
+            // Connect to backend WebSocket dynamically (no hardcoding IP)
+            const ws = new WebSocket(`ws://${location.host}/ws`);
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+
+            let x = canvas.width / 2;
+            let y = canvas.height / 2;
+
+            // smoothing
+            let smoothedAx = 0;
+            let smoothedAy = 0;
+            const alpha = 0.2; // smoothing factor
+            const scale = 2;   // movement scale factor
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                const ax = data.accel[0];
+                const ay = data.accel[1];
+
+                // low-pass filter
+                smoothedAx = alpha * ax + (1 - alpha) * smoothedAx;
+                smoothedAy = alpha * ay + (1 - alpha) * smoothedAy;
+
+                x += smoothedAx * scale;
+                y += smoothedAy * scale;
+
+                // clamp to canvas
+                if (x < 0) x = 0;
+                if (x > canvas.width) x = canvas.width;
+                if (y < 0) y = 0;
+                if (y > canvas.height) y = canvas.height;
+
+                ctx.fillStyle = "lime";
+                ctx.fillRect(x, y, 2, 2);
+            };
+        </script>
+    </body>
+</html>

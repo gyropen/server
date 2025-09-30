@@ -2,9 +2,12 @@ import asyncio
 import uvicorn
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
+# Allow frontend access
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,10 +18,22 @@ app.add_middleware(
 
 clients = []
 
+# --------------------------
+# Serve static files
+# --------------------------
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
+@app.get("/")
+async def serve_index():
+    return FileResponse("static/index.html")
+
+
+# --------------------------
+# API endpoint for IMU data
+# --------------------------
 @app.post("/imu-data/")
 async def imu_data(data: dict):
-    # broadcast to all WebSocket clients
+    print("Received IMU data:", data)
     to_remove = []
     for ws in clients:
         try:
@@ -30,6 +45,9 @@ async def imu_data(data: dict):
     return {"status": "ok"}
 
 
+# --------------------------
+# WebSocket endpoint
+# --------------------------
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket):
     await ws.accept()
