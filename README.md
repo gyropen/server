@@ -17,9 +17,7 @@ Gyropen is a system that reads accelerometer and gyroscope data from an MPU6050 
 
 ## System Architecture
 
-```
-ESP32 + MPU6050 → WiFi → FastAPI Server → WebSocket → Web Interface
-```
+``` ESP32 + MPU6050 → WiFi → FastAPI Server → WebSocket → Web Interface ```
 
 ### Components
 
@@ -64,6 +62,7 @@ pip install -r server/requirements.txt
 ```
 
 Key dependencies:
+
 - FastAPI
 - Uvicorn
 - WebSockets
@@ -92,14 +91,16 @@ PASSWORD = "your_wifi_password"
 Update the server IP address in both:
 
 1. `esp/server.py`:
-   ```python
-   SERVER_URL = "http://YOUR_SERVER_IP:8000/imu-data/"
-   ```
+
+```python
+SERVER_URL = "http://YOUR_SERVER_IP:8000/imu-data/"
+```
 
 2. `server/index.html`:
-   ```javascript
-   const ws = new WebSocket("ws://YOUR_SERVER_IP:8000/ws");
-   ```
+
+```javascript
+const ws = new WebSocket("ws://YOUR_SERVER_IP:8000/ws");
+```
 
 ## Installation & Usage
 
@@ -141,11 +142,13 @@ The system automatically calibrates when the ESP32 starts:
 ## Data Processing
 
 ### Sensor Data
+
 - **Accelerometer**: Measures linear acceleration in g-force
 - **Gyroscope**: Measures angular velocity in degrees/second
 - **Sampling Rate**: 20 Hz (50ms intervals)
 
 ### Filtering
+
 - **Complementary Filter**: Combines gyroscope and accelerometer data
 - **Alpha Value**: 0.98 (98% gyroscope, 2% accelerometer for angle estimation)
 - **Low-pass Filter**: Applied in web interface for smooth drawing
@@ -153,9 +156,11 @@ The system automatically calibrates when the ESP32 starts:
 ## API Endpoints
 
 ### POST `/imu-data/`
+
 Receives IMU data from ESP32
 
 **Request Body:**
+
 ```json
 {
   "accel": [ax, ay, az],
@@ -165,6 +170,7 @@ Receives IMU data from ESP32
 ```
 
 ### WebSocket `/ws`
+
 Real-time data streaming to web clients
 
 ## Troubleshooting
@@ -189,6 +195,7 @@ Real-time data streaming to web clients
 ### Debug Output
 
 The ESP32 provides serial output for debugging:
+
 - WiFi connection status
 - Calibration progress
 - Sensor offset values
@@ -199,6 +206,7 @@ The ESP32 provides serial output for debugging:
 ### Adjusting Sensitivity
 
 In `server/index.html`, modify:
+
 ```javascript
 const scale = 2; // Increase for more sensitive movement
 const alpha = 0.2; // Adjust smoothing (0.1 = more smooth, 0.5 = more responsive)
@@ -207,6 +215,7 @@ const alpha = 0.2; // Adjust smoothing (0.1 = more smooth, 0.5 = more responsive
 ### Filter Parameters
 
 In `esp/server.py`, adjust:
+
 ```python
 ALPHA = 0.98  # Complementary filter coefficient
 dt = 0.05     # Sampling interval (20 Hz)
